@@ -113,8 +113,9 @@ function Player.HasSkill(source, skillId)
 end
 
 Framework.OnPlayerLoaded(function(source)
-    Player.Load(source)
+    local data = Player.Load(source)
     Orders.CleanupStaleDelivery(source)
+    if data then Drivers.InitPlayer(source, data.identifier) end
 end)
 
 Framework.OnPlayerUnload(function(source)
