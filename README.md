@@ -35,15 +35,16 @@ Works with **qbox**, **qb-core**, and **ESX** out of the box.
 
 ## Installation
 
-1. Drop the resource into your server's `resources/` folder as `polarix_truckerjob`.
-2. Add to your `server.cfg`:
+1. IMPORTANT: Download the current version via the the [release section](https://github.com/derPolarix/polarix_truckerjob/releases).
+2. Drop the resource into your server's `resources/` folder as `polarix_truckerjob`.
+3. Add to your `server.cfg`:
    ```
    ensure ox_lib
    ensure oxmysql
    ensure polarix_truckerjob
    ```
-3. Take a look at the  `config/` files and adjust your framework setting and setup other settings to your liking.
-4. Start your server. Database tables are created automatically the first time the resource starts — no manual SQL import needed.
+4. Take a look at the  `config/` files and adjust your framework setting and setup other settings to your liking.
+5. Start your server. Database tables are created automatically the first time the resource starts — no manual SQL import needed.
 
 ## Configuration
 
