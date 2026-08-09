@@ -9,4 +9,5 @@ return {
     invitations  = "polarix_trucker_company_invitations",
     transactions = "polarix_trucker_company_transactions",
     notifications = "polarix_trucker_notifications",
+    driver_slots  = "polarix_trucker_driver_slots",
 }
