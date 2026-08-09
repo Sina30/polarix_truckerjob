@@ -179,7 +179,7 @@ function Forklift.Stow()
     end
 end
 
-local usingOxTarget = GetResourceState("ox_target") == "started"
+local usingTarget = Target.IsAvailable()
 local targetRegisteredFor = nil
 local promptVisible = false
 local lastLabel = nil
@@ -204,11 +204,11 @@ local function RunForkliftDockInteraction()
     end
 end
 
-local function EnsureOxTargetRegistered(trailer)
+local function EnsureTargetRegistered(trailer)
     if targetRegisteredFor == trailer then return end
     targetRegisteredFor = trailer
 
-    exports.ox_target:addLocalEntity(trailer, {
+    Target.AddLocalEntity(trailer, {
         {
             name = "trailer_forklift_load_pallet",
             icon = "fa-solid fa-pallet",
@@ -250,10 +250,10 @@ CreateThread(function()
     while true do
         Wait(500)
 
-        if usingOxTarget then
+        if usingTarget then
             local trailer = GetActiveTrailer()
             if trailer then
-                EnsureOxTargetRegistered(trailer)
+                EnsureTargetRegistered(trailer)
             end
         else
             local inRange = IsInForkliftInteractionRange()
@@ -280,7 +280,7 @@ lib.addKeybind({
     description = "Gabelstapler / Palette (am Trailer)",
     defaultKey = "E",
     onPressed = function()
-        if not usingOxTarget and promptVisible then
+        if not usingTarget and promptVisible then
             RunForkliftDockInteraction()
         end
     end,

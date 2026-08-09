@@ -53,9 +53,10 @@ local function setupBlip()
 end
 
 local function setupTarget(ped)
-    if GetResourceState("ox_target") == "started" then
-        exports.ox_target:addLocalEntity(ped, {
+    if Target.IsAvailable() then
+        Target.AddLocalEntity(ped, {
             {
+                name = "depot_open_dashboard",
                 icon = "fa-solid fa-truck",
                 label = Locale("ui.open_trucker_job"),
                 onSelect = openDashboard,
@@ -64,7 +65,7 @@ local function setupTarget(ped)
         return
     end
 
-    -- Fallback when ox_target isn't available: 3D marker + TextUI + E key
+    -- Fallback when no target system is available: 3D marker + TextUI + E key
     local coords = clientConfig.TruckDepotCoords
     local npcPos = vector3(coords.x, coords.y, coords.z)
     local promptVisible = false
