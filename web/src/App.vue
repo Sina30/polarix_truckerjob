@@ -373,13 +373,20 @@ const handleMessage = (event: MessageEvent) => {
 
 	switch (action) {
 		case "openNui": {
+			const wasAlreadyOpen = dashboardStore.isOpen;
 			persistantStore.IsNuiOpen = true;
 			router.push("/dashboard");
-			dashboardStore.open(
-				(raw.data as any)?.player !== undefined
-					? mapServerResponse(raw.data)
-					: (raw.data as Partial<DashboardConfig> | undefined)
-			);
+			const cfg = (raw.data as any)?.player !== undefined
+				? mapServerResponse(raw.data)
+				: (raw.data as Partial<DashboardConfig> | undefined);
+			// refetchDashboard reuses this same message to push fresh data into an
+			// already-open UI - open() would otherwise bounce the player back to
+			// the dashboard tab on every refetch (e.g. after hiring a driver).
+			if (wasAlreadyOpen) {
+				dashboardStore.refetch(cfg);
+			} else {
+				dashboardStore.open(cfg);
+			}
 			notificationsStore.setAll((raw.data as any)?.notifications ?? []);
 			partyStore.setState((raw.data as any)?.party ?? null);
 			partyStore.setMultiplier((raw.data as any)?.partyRewardMultiplier ?? null);

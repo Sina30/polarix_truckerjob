@@ -139,7 +139,7 @@ const navItems = computed(() => [
   { key: "orders", label: t('dashboard.nav_orders'), icon: "tabler:package", badge: String(store.config.openOrders) },
   { key: "vehicles", label: t('dashboard.nav_vehicles'), icon: "tabler:truck", badge: "" },
   { key: "skills", label: t('dashboard.nav_skills'), icon: "tabler:bolt", badge: "" },
-  { key: "drivers", label: t('dashboard.nav_drivers'), icon: "tabler:steering-wheel-2", badge: String(hiredDriverCount.value) },
+  { key: "drivers", label: t('dashboard.nav_drivers'), icon: "tabler:users", badge: String(hiredDriverCount.value) },
   { key: "company", label: t('dashboard.nav_company'), icon: "tabler:building-warehouse", badge: String(store.config.companyMembers) },
   { key: "leaderboard", label: t('dashboard.nav_leaderboard'), icon: "tabler:trophy", badge: "" },
   { key: "history", label: t('dashboard.nav_history'), icon: "tabler:history", badge: "" },

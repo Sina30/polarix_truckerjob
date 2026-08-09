@@ -399,6 +399,16 @@ export const useDashboardStore = defineStore("dashboard", {
       this.orderId = null;
       this.ctab = "overview";
     },
+    // Like open(), but for refetching data into an already-open dashboard —
+    // keeps the player on whatever tab they're currently viewing.
+    refetch(cfg?: Partial<DashboardConfig>) {
+      if (cfg) {
+        Object.assign(this.config, cfg);
+        if (cfg.orders !== undefined) {
+          this.config.openOrders = this.config.orders.length;
+        }
+      }
+    },
     close() {
       this.isOpen = false;
     },
