@@ -60,6 +60,7 @@ lib.callback.register("polarix_trucker:openDashboard", function(source)
         skillBranches = Skills.GetBranchesForPlayer(source),
         driverSlots      = server.DriverSlots,
         ownedDriverSlots = DB.GetPlayerDriverSlots(pData.identifier),
+        driverIncomeIntervalMinutes = server.DriverIncomeIntervalMinutes,
         levelTitles   = localizeList(sharedConfig.LevelTitles),
         xpThresholds  = sharedConfig.XPThresholds,
         company            = companyData,

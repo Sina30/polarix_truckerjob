@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export type TabKey = "dashboard" | "orders" | "vehicles" | "skills" | "company" | string;
+export type TabKey = "dashboard" | "orders" | "vehicles" | "skills" | "drivers" | "company" | string;
 export type CompanyTabKey = "overview" | "members" | "invitations" | "statistics" | "bank" | "settings";
 
 export interface Order {
@@ -71,6 +71,22 @@ export interface TrailerShop {
   price: string;
   locked: boolean;
   lvl: string;
+}
+
+export interface DriverSlotDef {
+  slot: string;
+  levelRequired: number;
+  price: number;
+  income: number;
+}
+
+export interface DriverSlot {
+  slot: string;
+  hired: boolean;
+  locked: boolean;
+  levelRequired: number;
+  price: string;
+  income: string;
 }
 
 export interface SkillNode {
@@ -187,6 +203,9 @@ export interface DashboardConfig {
   trailersShop: TrailerShop[];
   spawnedVehicleSlot: string | null;
   spawnedTrailerSlot: string | null;
+  driverSlotDefs: DriverSlotDef[];
+  driverSlots: DriverSlot[];
+  driverIncomeIntervalMinutes: number;
   branches: SkillBranch[];
   recentRuns: { route: string; code: string; reward: string; tag: string; icon: string; failed: boolean; status: "completed" | "failed" | "abandoned" | "active"; when: string }[];
   leaderboard: LeaderboardEntry[];
@@ -257,6 +276,29 @@ const defaultConfig: DashboardConfig = {
   ],
   spawnedVehicleSlot: "veh-owned-1",
   spawnedTrailerSlot: "trl-owned-1",
+  driverSlotDefs: [
+    { slot: "driver_0", levelRequired: 1,  price: 5000,   income: 50   },
+    { slot: "driver_1", levelRequired: 2,  price: 15000,  income: 120  },
+    { slot: "driver_2", levelRequired: 3,  price: 30000,  income: 220  },
+    { slot: "driver_3", levelRequired: 4,  price: 55000,  income: 380  },
+    { slot: "driver_4", levelRequired: 5,  price: 90000,  income: 600  },
+    { slot: "driver_5", levelRequired: 6,  price: 135000, income: 850  },
+    { slot: "driver_6", levelRequired: 7,  price: 190000, income: 1150 },
+    { slot: "driver_7", levelRequired: 9,  price: 260000, income: 1550 },
+    { slot: "driver_8", levelRequired: 11, price: 350000, income: 2000 },
+  ],
+  driverSlots: [
+    { slot: "driver_0", hired: false, locked: false, levelRequired: 1,  price: "$5,000",   income: "$50"   },
+    { slot: "driver_1", hired: false, locked: false, levelRequired: 2,  price: "$15,000",  income: "$120"  },
+    { slot: "driver_2", hired: false, locked: false, levelRequired: 3,  price: "$30,000",  income: "$220"  },
+    { slot: "driver_3", hired: false, locked: false, levelRequired: 4,  price: "$55,000",  income: "$380"  },
+    { slot: "driver_4", hired: false, locked: true,  levelRequired: 5,  price: "$90,000",  income: "$600"  },
+    { slot: "driver_5", hired: false, locked: true,  levelRequired: 6,  price: "$135,000", income: "$850"  },
+    { slot: "driver_6", hired: false, locked: true,  levelRequired: 7,  price: "$190,000", income: "$1,150" },
+    { slot: "driver_7", hired: false, locked: true,  levelRequired: 9,  price: "$260,000", income: "$1,550" },
+    { slot: "driver_8", hired: false, locked: true,  levelRequired: 11, price: "$350,000", income: "$2,000" },
+  ],
+  driverIncomeIntervalMinutes: 10,
   branches: [],
   recentRuns: [
     { route: "Los Santos Port → Sandy Shores", code: "#OR-2024-001231", reward: "$12,500", tag: "Completed", icon: "tabler:building-warehouse", failed: false, status: "completed", when: "2h ago" },

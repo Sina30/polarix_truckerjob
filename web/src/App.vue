@@ -23,7 +23,7 @@ import Sidebar from "@/components/app/Sidebar.vue";
 import GameHud from "@/components/app/GameHud.vue";
 import RentalPromptModal from "@/components/app/RentalPromptModal.vue";
 import { useDashboardStore } from "@/stores/dashboardStore";
-import type { DashboardConfig, Order, VehicleOwned, VehicleShop, TrailerOwned, TrailerShop, SkillBranch, SkillNode, LeaderboardEntry, CompanyLeaderboardEntry, OpenCompanyEntry, IncomingInvitation, RentalPrompt } from "@/stores/dashboardStore";
+import type { DashboardConfig, Order, VehicleOwned, VehicleShop, TrailerOwned, TrailerShop, SkillBranch, SkillNode, LeaderboardEntry, CompanyLeaderboardEntry, OpenCompanyEntry, IncomingInvitation, RentalPrompt, DriverSlotDef, DriverSlot } from "@/stores/dashboardStore";
 import { useGameHudStore } from "@/stores/gameHudStore";
 import { useNotificationsStore } from "@/stores/notificationsStore";
 import { usePartyStore } from "@/stores/partyStore";
@@ -39,6 +39,18 @@ const notificationsStore = useNotificationsStore();
 const partyStore = usePartyStore();
 const adminMissionsStore = useAdminMissionsStore();
 
+function buildDriverSlots(defs: DriverSlotDef[], owned: any[], level: number): DriverSlot[] {
+	const ownedSlots = new Set((owned ?? []).map((o: any) => o.slot));
+	return defs.map((d) => ({
+		slot: d.slot,
+		hired: ownedSlots.has(d.slot),
+		locked: level < d.levelRequired,
+		levelRequired: d.levelRequired,
+		price: `$${d.price.toLocaleString()}`,
+		income: `$${d.income.toLocaleString()}`,
+	}));
+}
+
 function mapServerResponse(data: any): Partial<DashboardConfig> {
 	const p = data.player ?? {};
 	const rawOrders: any[] = data.orders ?? [];
@@ -47,6 +59,8 @@ function mapServerResponse(data: any): Partial<DashboardConfig> {
 	const rawOwnedTrailers: any[] = data.ownedTrailers ?? [];
 	const rawTrailerShop: any[] = data.trailerShop ?? [];
 	const rawBranches: any[] = data.skillBranches ?? [];
+	const rawDriverDefs: any[] = data.driverSlots ?? [];
+	const rawOwnedDriverSlots: any[] = data.ownedDriverSlots ?? [];
 	const playerSkills: string[] = p.skills ?? [];
 	const equippedSlot: string = p.equipped_vehicle ?? '';
 	const equippedTrailerSlot: string = p.equipped_trailer ?? '';
@@ -183,6 +197,14 @@ function mapServerResponse(data: any): Partial<DashboardConfig> {
 		deliveries: r.total_deliveries ?? 0,
 		earned: fmtMoney(r.total_earnings ?? 0),
 	}));
+
+	const driverSlotDefs: DriverSlotDef[] = rawDriverDefs.map((d: any) => ({
+		slot: d.slot ?? '',
+		levelRequired: d.level_required ?? 1,
+		price: d.price ?? 0,
+		income: d.income ?? 0,
+	}));
+	const driverSlots: DriverSlot[] = buildDriverSlots(driverSlotDefs, rawOwnedDriverSlots, p.level ?? 1);
 
 	const openCompanies: OpenCompanyEntry[] = (data.openCompanies ?? []).map((c: any) => ({
 		id:          c.id ?? 0,
@@ -323,6 +345,9 @@ function mapServerResponse(data: any): Partial<DashboardConfig> {
 		vehiclesShop,
 		trailersOwned,
 		trailersShop,
+		driverSlotDefs,
+		driverSlots,
+		driverIncomeIntervalMinutes: data.driverIncomeIntervalMinutes ?? 10,
 		branches,
 		recentRuns,
 		leaderboard,
@@ -413,6 +438,15 @@ const handleMessage = (event: MessageEvent) => {
 					equipped:   t.trailer_slot === slot,
 				} as TrailerOwned;
 			});
+			break;
+		}
+		case "updateDriverSlots": {
+			const d = raw.data as { ownedDriverSlots: any[] };
+			dashboardStore.config.driverSlots = buildDriverSlots(
+				dashboardStore.config.driverSlotDefs,
+				d.ownedDriverSlots ?? [],
+				dashboardStore.config.driverLevel
+			);
 			break;
 		}
 		case "equippedVehicleSlot": {
