@@ -1,5 +1,6 @@
 return {
     Framework = "qbox", -- "qbox", "qb-core", "esx"
+    Target = "ox_target", -- "ox_target", "qb-target", "sleepless_interact", "none"
     Debug = false,
     PrintDebug = true,
 
