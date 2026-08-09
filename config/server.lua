@@ -14,4 +14,21 @@ return {
         { slot = "flatbed-std",   name = "Trailer Container Variant",   model = "docktrailer", price = 200000, level_required = 3 },
 
     },
+
+    -- Passives Einkommen: Fahrer-Slots. price = einmaliger Kaufpreis, income = Auszahlung
+    -- pro DriverIncomeIntervalMinutes (fix, unabhängig von Aktivität).
+    -- WERTE SIND PLATZHALTER — noch zu balancen.
+    DriverSlots = {
+        { slot = "driver_0", level_required = 1,  price = 5000,   income = 50   },
+        { slot = "driver_1", level_required = 2,  price = 15000,  income = 120  },
+        { slot = "driver_2", level_required = 3,  price = 30000,  income = 220  },
+        { slot = "driver_3", level_required = 4,  price = 55000,  income = 380  },
+        { slot = "driver_4", level_required = 5,  price = 90000,  income = 600  },
+        { slot = "driver_5", level_required = 6,  price = 135000, income = 850  },
+        { slot = "driver_6", level_required = 7,  price = 190000, income = 1150 },
+        { slot = "driver_7", level_required = 9,  price = 260000, income = 1550 },
+        { slot = "driver_8", level_required = 11, price = 350000, income = 2000 },
+    },
+    -- Intervall in Minuten, in dem jeder angestellte Fahrer sein `income` auszahlt.
+    DriverIncomeIntervalMinutes = 10,
 }

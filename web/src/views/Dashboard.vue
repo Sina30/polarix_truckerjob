@@ -86,6 +86,7 @@
           <OrdersTab v-else-if="store.tab === 'orders'" />
           <VehiclesTab v-else-if="store.tab === 'vehicles'" />
           <SkillsTab v-else-if="store.tab === 'skills'" />
+          <DriversTab v-else-if="store.tab === 'drivers'" />
           <CompanyTab v-else-if="store.tab === 'company'" />
           <LeaderboardTab v-else-if="store.tab === 'leaderboard'" />
           <HistoryTab v-else-if="store.tab === 'history'" />
@@ -111,6 +112,7 @@ import DashboardTab from "@/components/dashboard/tabs/DashboardTab.vue";
 import OrdersTab from "@/components/dashboard/tabs/OrdersTab.vue";
 import VehiclesTab from "@/components/dashboard/tabs/VehiclesTab.vue";
 import SkillsTab from "@/components/dashboard/tabs/SkillsTab.vue";
+import DriversTab from "@/components/dashboard/tabs/DriversTab.vue";
 import CompanyTab from "@/components/dashboard/tabs/CompanyTab.vue";
 import LeaderboardTab from "@/components/dashboard/tabs/LeaderboardTab.vue";
 import HistoryTab from "@/components/dashboard/tabs/HistoryTab.vue";
@@ -130,12 +132,14 @@ const time = computed(() => now.value.toLocaleTimeString([], { hour: "2-digit", 
 const date = computed(() => now.value.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" }));
 
 const xpPct = computed(() => Math.round((store.config.driverXp / store.config.driverXpMax) * 100));
+const hiredDriverCount = computed(() => store.config.driverSlots.filter(s => s.hired).length);
 
 const navItems = computed(() => [
   { key: "dashboard", label: t('dashboard.nav_dashboard'), icon: "tabler:layout-dashboard", badge: "" },
   { key: "orders", label: t('dashboard.nav_orders'), icon: "tabler:package", badge: String(store.config.openOrders) },
   { key: "vehicles", label: t('dashboard.nav_vehicles'), icon: "tabler:truck", badge: "" },
   { key: "skills", label: t('dashboard.nav_skills'), icon: "tabler:bolt", badge: "" },
+  { key: "drivers", label: t('dashboard.nav_drivers'), icon: "tabler:users", badge: String(hiredDriverCount.value) },
   { key: "company", label: t('dashboard.nav_company'), icon: "tabler:building-warehouse", badge: String(store.config.companyMembers) },
   { key: "leaderboard", label: t('dashboard.nav_leaderboard'), icon: "tabler:trophy", badge: "" },
   { key: "history", label: t('dashboard.nav_history'), icon: "tabler:history", badge: "" },

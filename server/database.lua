@@ -42,6 +42,17 @@ function DB.InsertTrailer(identifier, trailerSlot, trailerModel)
     )
 end
 
+function DB.GetPlayerDriverSlots(identifier)
+    return MySQL.query.await(("SELECT * FROM %s WHERE identifier = ?"):format(T.driver_slots), { identifier })
+end
+
+function DB.InsertDriverSlot(identifier, slot)
+    return MySQL.insert.await(
+        ("INSERT INTO %s (identifier, slot) VALUES (?, ?)"):format(T.driver_slots),
+        { identifier, slot }
+    )
+end
+
 function DB.GetAvailableOrders()
     return MySQL.query.await(("SELECT * FROM %s WHERE is_active = 1"):format(T.orders))
 end
