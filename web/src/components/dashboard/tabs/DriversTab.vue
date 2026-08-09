@@ -8,8 +8,10 @@
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
       <div v-for="d in store.config.driverSlots" :key="d.slot" style="background:#fff;border:1px solid #dfe2e6;border-radius:15px;overflow:hidden;display:flex;flex-direction:column">
         <div style="position:relative">
-          <div style="width:100%;height:150px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden">
-            <img v-if="driverImages[d.slot]" :src="driverImages[d.slot]" :alt="slotLabel(d.slot)" style="width:100%;height:100%;object-fit:contain" />
+          <div style="width:100%;height:150px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+            <!-- portraits are full-body renders; enlarge + top-anchor so overflow:hidden crops the
+                 bottom 15% (legs/feet), keeping the framing on the upper body -->
+            <img v-if="driverImages[d.slot]" :src="driverImages[d.slot]" :alt="slotLabel(d.slot)" style="position:absolute;top:0;left:0;width:100%;height:117.65%;object-fit:contain" />
             <iconify-icon v-else icon="tabler:user" width="48" style="color:#aab0b8"></iconify-icon>
           </div>
           <div v-if="d.locked" style="position:absolute;inset:0;background:rgba(34,38,45,0.55);display:flex;align-items:center;justify-content:center">
