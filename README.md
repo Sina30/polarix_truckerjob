@@ -21,6 +21,7 @@ Works with **qbox**, **qb-core**, and **ESX** out of the box.
 - **Skill tree** — three branches (Hauling, Economy, Endurance) with perks that reduce cargo damage, cut fuel costs, boost payouts and XP, and unlock hazmat/long-haul routes.
 - **Vehicles & trailers** — buy trucks and trailers with capacity limits; trailer type determines how many pallets fit. No truck or trailer of your own? Rent a bundle on the spot.
 - **Companies** — form a trucking company with a shared bank, member roles, invitations, and stats.
+- **Drivers** — hire NPC drivers to earn passive income that pays out automatically over time, even while you're off doing other jobs.
 - **Party convoys** — team up with up to 5 players, split loading duty across a shared pallet pool, and earn a group reward bonus.
 - **Admin mission editor** — build and edit delivery routes in-game with a live preview of pickup/drop-off. Changes go live instantly, no resource restart needed.
 - **Multi-language** — dashboard and notifications support multiple languages out of the box, easily expandable.
