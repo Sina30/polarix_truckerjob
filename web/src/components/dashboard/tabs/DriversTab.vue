@@ -54,7 +54,9 @@ for (const path in driverImageFiles) {
 }
 
 function slotLabel(slot: string): string {
-  const n = slot.split("_").pop() ?? "0";
+  // internal slot keys (driver_0, driver_1, ...) stay 0-indexed for DB/config
+  // stability - only the displayed label is shifted to a 1-based count.
+  const n = parseInt(slot.split("_").pop() ?? "0", 10) + 1;
   return t('drivers.slot_label', { n });
 }
 
