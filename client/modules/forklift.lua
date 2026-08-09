@@ -107,6 +107,11 @@ function Forklift.Deploy()
     SetEntityAsMissionEntity(forklift, true, true)
     SetModelAsNoLongerNeeded(modelHash)
 
+    -- Forklift drives into the trailer bed to dock/stow; without this its mesh
+    -- colliding with the trailer body can knock the trailer's hitch loose.
+    SetEntityNoCollisionEntity(forklift, trailer, true)
+    SetEntityNoCollisionEntity(trailer, forklift, true)
+
     SetVehicleDoorsLocked(forklift, 1)
     Framework.GiveVehicleKeys(forklift, "FORKLIFT")
 
@@ -129,14 +134,6 @@ function Forklift.Stow()
         return
     end
 
-    local trailer = GetActiveTrailer()
-    if not trailer then return end
-    local dist = #(GetEntityCoords(dock.entity) - GetEntityCoords(trailer))
-    if dist > 10.0 then
-        Framework.Notify(Locale("notify.bring_forklift_closer_trailer"), "error")
-        return
-    end
-
     local ok = lib.progressCircle({
         duration = 3000,
         position = "bottom",
@@ -152,6 +149,25 @@ function Forklift.Stow()
         return
     end
 
+    -- Forklift may still have the player inside; deleting it while occupied can
+    -- jolt the attached trailer's physical hitch and trip the "trailer detached"
+    -- check in delivery.lua's damage monitor.
+    local ped = PlayerPedId()
+    if GetVehiclePedIsIn(ped, false) == dock.entity then
+        SetVehicleDoorsLocked(dock.entity, 0)
+        TaskLeaveVehicle(ped, dock.entity, 0)
+        local tries = 0
+        while GetVehiclePedIsIn(ped, false) == dock.entity and tries < 60 do
+            Wait(50)
+            tries = tries + 1
+        end
+        if GetVehiclePedIsIn(ped, false) == dock.entity then
+            Framework.Notify(Locale("notify.exit_forklift_first"), "error")
+            return
+        end
+    end
+
+    Wait(1500)
     DeleteEntity(dock.entity)
     ForkliftDockState[netId] = nil
     Framework.Notify(Locale("notify.forklift_stowed"), "success")

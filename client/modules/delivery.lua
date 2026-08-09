@@ -134,6 +134,7 @@ function Delivery.StartDamageMonitor(veh)
     local isSensitive = o.cargo_type == "fragile" or o.cargo_type == "live"
     local speedLimit = o.cargo_type == "live" and SPEED_LIMIT_LIVE or SPEED_LIMIT_FRAGILE
     local prevHealth = GetVehicleBodyHealth(veh)
+    local detachedStrikes = 0
 
     CreateThread(function()
         while DeliveryState.status == "delivering" do
@@ -154,9 +155,16 @@ function Delivery.StartDamageMonitor(veh)
                 if not DoesEntityExist(trailerEntity) then
                     Delivery.ForceFailure(Locale("notify.trailer_destroyed"))
                     break
-                elseif GetVehicleTrailerVehicle(veh) ~= trailerEntity then
-                    Delivery.ForceFailure(Locale("notify.trailer_detached"))
-                    break
+                elseif select(2, GetVehicleTrailerVehicle(veh)) ~= trailerEntity then
+                    -- Require two consecutive misses before failing — a single stale
+                    -- read right after docking/stowing shouldn't end the delivery.
+                    detachedStrikes = detachedStrikes + 1
+                    if detachedStrikes >= 2 then
+                        Delivery.ForceFailure(Locale("notify.trailer_detached"))
+                        break
+                    end
+                else
+                    detachedStrikes = 0
                 end
             end
 

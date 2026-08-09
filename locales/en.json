@@ -55,6 +55,7 @@
     "notify.forklift_unloaded": "Forklift unloaded.",
     "notify.take_pallet_off_forks_first": "Take the pallet off the forks first.",
     "notify.bring_forklift_closer_trailer": "Bring the forklift closer to the trailer.",
+    "notify.exit_forklift_first": "Get out of the forklift first.",
     "notify.forklift_stowed": "Forklift stowed.",
     "notify.your_company_was_disbanded": "Your company was disbanded.",
     "notify.skill_unlocked": "Skill unlocked!",

@@ -55,6 +55,7 @@
     "notify.forklift_unloaded": "Gabelstapler ausgeladen.",
     "notify.take_pallet_off_forks_first": "Erst die Palette von der Gabel nehmen.",
     "notify.bring_forklift_closer_trailer": "Bring den Gabelstapler näher zum Trailer.",
+    "notify.exit_forklift_first": "Erst aus dem Gabelstapler aussteigen.",
     "notify.forklift_stowed": "Gabelstapler verstaut.",
     "notify.your_company_was_disbanded": "Deine Company wurde aufgelöst.",
     "notify.skill_unlocked": "Skill freigeschaltet!",

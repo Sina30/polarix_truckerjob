@@ -229,7 +229,10 @@ local function GetFreeTrailerSlot(maxPallets)
     return nil
 end
 
+local palletLoadBusy = false
+
 function TryLoadPalletOnTrailer()
+    if palletLoadBusy then return end
     if not ForkliftPallet.entity or not DoesEntityExist(ForkliftPallet.entity) then return end
     local trailer = GetActiveTrailer()
     if not trailer then return end
@@ -247,6 +250,8 @@ function TryLoadPalletOnTrailer()
         return
     end
 
+    palletLoadBusy = true
+
     local ok = lib.progressCircle({
         duration = 4000,
         position = "bottom",
@@ -255,14 +260,24 @@ function TryLoadPalletOnTrailer()
         disable = { car = true, move = true, combat = true },
     })
 
-    if not ok then return end
+    if not ok then
+        palletLoadBusy = false
+        return
+    end
 
-    if not ForkliftPallet.entity or not DoesEntityExist(ForkliftPallet.entity) then return end
-    if LoadedPallets[slot] then return end
+    if not ForkliftPallet.entity or not DoesEntityExist(ForkliftPallet.entity) then
+        palletLoadBusy = false
+        return
+    end
+    if LoadedPallets[slot] then
+        palletLoadBusy = false
+        return
+    end
 
     local offset = trailerConfig.attachOffsets[slot]
     if not offset then
         Framework.Notify(Locale("notify.slot_offset_missing_not_calibrated"), "error")
+        palletLoadBusy = false
         return
     end
 
@@ -292,6 +307,8 @@ function TryLoadPalletOnTrailer()
     else
         Framework.Notify(Locale("notify.pallet_loaded"):format(MissionCargo.loadedCount, MissionCargo.requiredCount), "success")
     end
+
+    palletLoadBusy = false
 end
 
 function CleanupMissionPalletsOnTrailer()
@@ -319,8 +336,6 @@ CreateThread(function()
                 else
                     Framework.Notify(Locale("notify.no_pallets_left_pool"), "info")
                 end
-            elseif dist >= 40.0 and MissionCargo.pickupSpawned then
-                DespawnMissionPallets()
             end
         elseif MissionCargo.pickupSpawned then
             DespawnMissionPallets()
