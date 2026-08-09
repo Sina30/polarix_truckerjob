@@ -25,6 +25,7 @@ Works with **qbox**, **qb-core**, and **ESX** out of the box.
 - **Party convoys** — team up with up to 5 players, split loading duty across a shared pallet pool, and earn a group reward bonus.
 - **Admin mission editor** — build and edit delivery routes in-game with a live preview of pickup/drop-off. Changes go live instantly, no resource restart needed.
 - **Multi-language** — dashboard and notifications support multiple languages out of the box, easily expandable.
+- **Multiple target systems** — works with ox_target, qb-target, or sleepless_interact, selectable in config, no code changes needed.
 - **Polished dashboard** — for orders, skills, fleet, and company management.
 - **Props included** — invincible rescaled native props made by [StraussMoewe](https://sm3d.tebex.io)
 
