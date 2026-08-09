@@ -12,6 +12,10 @@ RegisterNetEvent("polarix_trucker:levelUp", function(newLevel)
     Framework.Notify(Locale("notify.level_up_now_level"):format(newLevel), "success")
 end)
 
+RegisterNetEvent("polarix_trucker:driverIncomePaid", function(amount)
+    Framework.Notify(Locale("notify.driver_income_paid"):format(lib.math.groupdigits(amount, ',')), "info")
+end)
+
 function GetLocalPlayerData()
     return LocalPlayerData
 end

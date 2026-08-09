@@ -67,6 +67,18 @@ RegisterNUICallback('buyVehicle', function(data, cb)
     end, data.slot)
 end)
 
+RegisterNUICallback('hireDriver', function(data, cb)
+    lib.callback('polarix_trucker:hireDriver', false, function(success, price, err, ownedDriverSlots)
+        if success then
+            Framework.Notify(Locale("notify.driver_hired"):format(lib.math.groupdigits(price, ',')), 'success')
+            SendMessage('updateDriverSlots', { ownedDriverSlots = ownedDriverSlots })
+        else
+            Framework.Notify(err or Locale("notify.purchase_failed"), 'error')
+        end
+        cb({ ok = success })
+    end, data.slot)
+end)
+
 RegisterNUICallback('equipVehicle', function(data, cb)
     lib.callback('polarix_trucker:equipVehicle', false, function(success, err)
         if success then
