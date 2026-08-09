@@ -62,7 +62,7 @@ Server admins open the in-game editor with `/truckeradmin` to create, edit, or d
 
 ## Support
 
-Report bugs or request features via [GitHub Issues](https://github.com/derPolarix/polarix_truckerjob/issues).
+Report bugs or request features via Tickets on [my Discord](https://discord.gg/EfzCFzqTRR) or via [GitHub Issues](https://github.com/derPolarix/polarix_truckerjob/issues).
 
 
 <a href="https://www.star-history.com/?repos=derPolarix%2Fpolarix_truckerjob&type=date&legend=top-left">
