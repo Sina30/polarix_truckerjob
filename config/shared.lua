@@ -5,6 +5,7 @@ return {
     PrintDebug = true,
 
     -- language for locales/<Language>.json, the SSOT for all user-facing text
+    -- valid: "en", "de", "fr", "es", "pt-br", "pl", "nl", "it", "tr"
     Language = "en",
 
     -- name/desc are locales/*.json keys, not display text — resolved via Locale()
