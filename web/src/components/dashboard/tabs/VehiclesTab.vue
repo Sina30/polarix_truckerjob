@@ -36,8 +36,9 @@
                 <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:0.06em;text-transform:uppercase;color:#9aa1ab">{{ t('vehicles.tank_label') }}</div>
               </div>
             </div>
-            <div v-if="v.equipped && v.slot === store.config.spawnedVehicleSlot" style="margin-top:14px;width:100%;text-align:center;padding:10px;border-radius:10px;background:rgba(47,158,99,0.12);color:#2f9e63;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:7px">
-              <iconify-icon icon="tabler:circle-check-filled" width="16"></iconify-icon>{{ t('vehicles.equipped_label') }}
+            <div v-if="v.equipped && v.slot === store.config.spawnedVehicleSlot" style="margin-top:14px;display:flex">
+              <button class="equip-btn" style="flex:1;padding:10px;border-radius:10px 0 0 10px;border:1px solid #dfe2e6;border-right:none;background:#fff;color:#3c424b;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="equipVehicle(v.slot)">{{ t('vehicles.call_vehicle') }}</button>
+              <button class="park-btn" style="flex:1;padding:10px;border-radius:0 10px 10px 0;border:1px solid #dfe2e6;background:#fff;color:#dc2626;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="parkVehicle()">{{ t('vehicles.park_vehicle') }}</button>
             </div>
             <button v-else class="equip-btn" style="margin-top:14px;width:100%;padding:10px;border-radius:10px;border:1px solid #dfe2e6;background:#fff;color:#3c424b;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="equipVehicle(v.slot)">{{ v.equipped ? t('vehicles.call_vehicle') : t('vehicles.equip') }}</button>
           </div>
@@ -100,9 +101,11 @@
             <div style="display:flex;align-items:center;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid #eef0f2;font-size:12px;color:#6b7280">
               <iconify-icon icon="tabler:stack-2" width="16" style="color:#9aa1ab"></iconify-icon>{{ t('vehicles.pallet_slots', { count: tr.maxPallets }) }}
             </div>
-            <div v-if="tr.equipped" style="margin-top:14px;width:100%;text-align:center;padding:10px;border-radius:10px;background:rgba(47,158,99,0.12);color:#2f9e63;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:7px">
-              <iconify-icon icon="tabler:circle-check-filled" width="16"></iconify-icon>{{ tr.slot === store.config.spawnedTrailerSlot ? t('vehicles.attached') : t('vehicles.selected') }}
+            <div v-if="tr.equipped && tr.slot === store.config.spawnedTrailerSlot" style="margin-top:14px;display:flex">
+              <button class="equip-btn" style="flex:1;padding:10px;border-radius:10px 0 0 10px;border:1px solid #dfe2e6;border-right:none;background:#fff;color:#3c424b;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="equipTrailer(tr.slot)">{{ t('vehicles.call_trailer') }}</button>
+              <button class="park-btn" style="flex:1;padding:10px;border-radius:0 10px 10px 0;border:1px solid #dfe2e6;background:#fff;color:#dc2626;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="parkTrailer()">{{ t('vehicles.park_trailer') }}</button>
             </div>
+            <button v-else-if="tr.equipped" class="equip-btn" style="margin-top:14px;width:100%;padding:10px;border-radius:10px;border:1px solid #dfe2e6;background:#fff;color:#3c424b;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="equipTrailer(tr.slot)">{{ t('vehicles.call_trailer') }}</button>
             <button v-else class="equip-btn" style="margin-top:14px;width:100%;padding:10px;border-radius:10px;border:1px solid #dfe2e6;background:#fff;color:#3c424b;font-family:inherit;font-weight:600;font-size:13px;cursor:pointer" @click="equipTrailer(tr.slot)">{{ t('vehicles.select') }}</button>
           </div>
         </div>
@@ -163,12 +166,20 @@ async function equipVehicle(slot: string) {
   await nuiCallback("equipVehicle", { slot });
 }
 
+async function parkVehicle() {
+  await nuiCallback("parkVehicle");
+}
+
 async function buyVehicle(slot: string) {
   await nuiCallback("buyVehicle", { slot });
 }
 
 async function equipTrailer(slot: string) {
   await nuiCallback("equipTrailer", { slot });
+}
+
+async function parkTrailer() {
+  await nuiCallback("parkTrailer");
 }
 
 async function buyTrailer(slot: string) {
@@ -179,5 +190,9 @@ async function buyTrailer(slot: string) {
 <style scoped>
 .equip-btn:hover {
   border-color: var(--accent) !important;
+}
+.park-btn:hover {
+  border-color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.06) !important;
 }
 </style>

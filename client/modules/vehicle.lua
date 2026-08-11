@@ -79,6 +79,18 @@ function Vehicle.Despawn()
     SendMessage("vehicleSpawnState", { slot = LocalVehicle.slot, spawned = false })
 end
 
+-- UI-triggered "Park vehicle" action — blocked mid-delivery so a driver can't lose
+-- their loaded cargo by deleting the truck out from under it.
+function Vehicle.Park()
+    if DeliveryState.status ~= "idle" then
+        Framework.Notify(Locale("notify.cannot_park_during_delivery"), "error")
+        return false
+    end
+    Vehicle.Despawn()
+    Framework.Notify(Locale("notify.vehicle_parked"), "success")
+    return true
+end
+
 CreateThread(function()
     Wait(500)
     SendMessage("vehicleSpawnState", { slot = nil, spawned = false })

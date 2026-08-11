@@ -77,6 +77,17 @@ function Trailer.Despawn()
     SendMessage("trailerSpawnState", { slot = LocalTrailer.slot, spawned = false })
 end
 
+-- UI-triggered "Park trailer" action — same mid-delivery guard as Vehicle.Park().
+function Trailer.Park()
+    if DeliveryState.status ~= "idle" then
+        Framework.Notify(Locale("notify.cannot_park_during_delivery"), "error")
+        return false
+    end
+    Trailer.Despawn()
+    Framework.Notify(Locale("notify.trailer_parked"), "success")
+    return true
+end
+
 RegisterNetEvent("polarix_trucker:trailerEquipped", function(trailerSlot, trailerModel)
     LocalTrailer.slot  = trailerSlot
     LocalTrailer.model = trailerModel
