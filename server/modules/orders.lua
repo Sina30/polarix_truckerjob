@@ -20,6 +20,8 @@ end
 
 -- Seconds left before `order` can be accepted again, given the player's last completed
 -- delivery timestamp for it (nil = never completed it). 0 = no cooldown / already expired.
+-- Exposed on Orders since party_mission.lua's convoy-start path duplicates Orders.Accept's
+-- gate checks and needs the same cooldown enforcement.
 local function cooldownRemaining(order, lastCompletedAt)
     local cooldown = order.cooldown_seconds or 0
     if cooldown <= 0 then return 0 end
@@ -28,6 +30,7 @@ local function cooldownRemaining(order, lastCompletedAt)
     local remaining = cooldown - (os.time() - completedEpoch)
     return remaining > 0 and remaining or 0
 end
+Orders.CooldownRemaining = cooldownRemaining
 
 function Orders.GetAvailableForPlayer(source)
     local pData = Player.GetData(source)
