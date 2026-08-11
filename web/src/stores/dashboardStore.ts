@@ -29,6 +29,7 @@ export interface Order {
   tagColor: string;
   tagBg: string;
   icon: string;
+  cooldownAvailableAt: number | null;
 }
 
 export interface VehicleOwned {

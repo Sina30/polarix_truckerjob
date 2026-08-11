@@ -73,6 +73,17 @@
             <label class="chk" style="margin-top:18px"><input type="checkbox" v-model="store.form.requires_long_hauler" /><span class="chk-box"></span> {{ t('admin.long_hauler_required') }}</label>
           </div>
 
+          <label class="field-label" style="margin-top:10px">{{ t('admin.cooldown_label') }}
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="number" min="0" max="99" :value="cooldownPart('h')" @input="setCooldownPart('h', ($event.target as HTMLInputElement).valueAsNumber)" class="fld" style="width:64px" title="HH" />
+              <span style="color:#9aa1ab;font-weight:700">:</span>
+              <input type="number" min="0" max="59" :value="cooldownPart('m')" @input="setCooldownPart('m', ($event.target as HTMLInputElement).valueAsNumber)" class="fld" style="width:64px" title="MM" />
+              <span style="color:#9aa1ab;font-weight:700">:</span>
+              <input type="number" min="0" max="59" :value="cooldownPart('s')" @input="setCooldownPart('s', ($event.target as HTMLInputElement).valueAsNumber)" class="fld" style="width:64px" title="SS" />
+              <span style="font-size:10px;color:#9aa1ab;margin-left:4px">{{ store.form.cooldown_seconds > 0 ? t('admin.cooldown_active_hint') : t('admin.cooldown_none_hint') }}</span>
+            </div>
+          </label>
+
           <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9aa1ab;margin:18px 0 8px">{{ t('admin.pickup_heading') }}</div>
           <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;align-items:end">
             <label class="field-label">{{ t('admin.label_field') }}<input v-model="store.form.pickup_label" class="fld" /></label>
@@ -206,6 +217,23 @@ function select(id: string) {
 
 function onCargoTypeChange(type: string) {
   store.applyCargoType(type);
+}
+
+function cooldownPart(unit: "h" | "m" | "s"): number {
+  const total = store.form?.cooldown_seconds ?? 0;
+  if (unit === "h") return Math.floor(total / 3600);
+  if (unit === "m") return Math.floor((total % 3600) / 60);
+  return total % 60;
+}
+
+function setCooldownPart(unit: "h" | "m" | "s", rawValue: number) {
+  if (!store.form) return;
+  const value = Number.isFinite(rawValue) ? Math.floor(rawValue) : 0;
+  const h = unit === "h" ? value : cooldownPart("h");
+  const m = unit === "m" ? value : cooldownPart("m");
+  const s = unit === "s" ? value : cooldownPart("s");
+  const clamp = (n: number, max: number) => Math.max(0, Math.min(max, n));
+  store.form.cooldown_seconds = clamp(h, 99) * 3600 + clamp(m, 59) * 60 + clamp(s, 59);
 }
 
 function onDropoffCoordsChange() {

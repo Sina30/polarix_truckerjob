@@ -111,6 +111,7 @@ function mapServerResponse(data: any): Partial<DashboardConfig> {
 		tagColor: o.tag_color ?? '#9aa1ab',
 		tagBg: o.tag_bg ?? '#f1f2f4',
 		icon: o.icon ?? 'tabler:package',
+		cooldownAvailableAt: (o.cooldown_remaining ?? 0) > 0 ? Date.now() + o.cooldown_remaining * 1000 : null,
 	}));
 
 	const vehiclesOwned: VehicleOwned[] = rawOwned.map((v: any) => {
