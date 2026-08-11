@@ -26,6 +26,9 @@ function PartyMission.Start(source, orderId)
     if order.level_required > pData.level then return false, Locale("error.level_not_sufficient") end
     if isTruthy(order.requires_hazmat) and not Player.HasSkill(source, "h3") then return false, Locale("error.hazmat_license_required") end
     if isTruthy(order.requires_long_hauler) and not Player.HasSkill(source, "d3") then return false, Locale("error.long_hauler_skill_required") end
+    if Orders.CooldownRemaining(order, DB.GetLastCompletedAt(pData.identifier, orderId)) > 0 then
+        return false, Locale("error.mission_on_cooldown")
+    end
     if type(order.pickup_pallet_coords) == "string" then order.pickup_pallet_coords = json.decode(order.pickup_pallet_coords) end
 
     local total = cargo.CalcPalletCount(order.weight_kg)

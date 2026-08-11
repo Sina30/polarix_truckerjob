@@ -18,6 +18,7 @@
       :key="o.id"
       class="order-row"
       style="display:flex;align-items:center;gap:18px;width:100%;text-align:left;background:#fff;border:1px solid #dfe2e6;border-radius:14px;padding:16px 18px;cursor:pointer;font-family:inherit"
+      :style="{ opacity: remainingSeconds(o) > 0 ? 0.55 : 1 }"
       @click="store.openOrder(o.id)"
     >
       <div style="width:52px;height:52px;border-radius:13px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -28,7 +29,10 @@
           <span style="font-size:16px;font-weight:700;color:#1b1f24">{{ o.name }}</span>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.06em;padding:2px 7px;border-radius:6px" :style="{ background: o.tagBg, color: o.tagColor }">{{ o.tag }}</span>
         </div>
-        <div v-if="o.lvlReq" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9aa1ab;margin-top:5px">{{ o.lvlReq }} {{ t('orders.required_suffix') }}</div>
+        <div v-if="remainingSeconds(o) > 0" style="display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9aa1ab;margin-top:5px">
+          <iconify-icon icon="tabler:clock-hour-4" width="12"></iconify-icon>{{ t('orders.cooldown_badge', { time: formatHMS(remainingSeconds(o)) }) }}
+        </div>
+        <div v-else-if="o.lvlReq" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9aa1ab;margin-top:5px">{{ o.lvlReq }} {{ t('orders.required_suffix') }}</div>
       </div>
       <div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
         <div v-for="col in orderCols(o)" :key="col.label">
@@ -139,8 +143,12 @@
           </div>
         </div>
       </div>
+      <div v-if="orderCooldownRemaining > 0" style="margin-top:14px;width:100%;padding:15px;font-size:13px;text-align:center;color:#9aa1ab;background:#f6f7f8;border:1px solid #eef0f2;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <iconify-icon icon="tabler:clock-hour-4" width="17"></iconify-icon>
+        {{ t('orders.cooldown_detail_hint', { time: formatHMS(orderCooldownRemaining) }) }}
+      </div>
       <button
-        v-if="!inParty || isLeader"
+        v-else-if="!inParty || isLeader"
         class="accent-btn"
         style="margin-top:14px;width:100%;padding:15px;font-size:15px;justify-content:center"
         @click="acceptOrder"
@@ -165,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useDashboardStore } from "@/stores/dashboardStore";
 import { usePartyStore } from "@/stores/partyStore";
@@ -180,6 +188,28 @@ const { t } = useI18n();
 const order = computed(() => store.config.orders.find(o => o.id === store.orderId) ?? store.config.orders[0]);
 const inParty = computed(() => !!partyStore.party);
 const isLeader = computed(() => !!partyStore.party?.members.some(m => m.isLeader && m.name === store.config.driverName));
+
+// Cooldown countdown ticks purely client-side from the snapshot taken when the dashboard
+// last opened (Order.cooldownAvailableAt) - no server polling needed while the tab is open.
+const now = ref(Date.now());
+let tickInterval: ReturnType<typeof setInterval> | undefined;
+onMounted(() => { tickInterval = setInterval(() => { now.value = Date.now(); }, 1000); });
+onUnmounted(() => { if (tickInterval) clearInterval(tickInterval); });
+
+function remainingSeconds(o: Order): number {
+  if (!o.cooldownAvailableAt) return 0;
+  return Math.max(0, Math.ceil((o.cooldownAvailableAt - now.value) / 1000));
+}
+
+function formatHMS(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+const orderCooldownRemaining = computed(() => remainingSeconds(order.value));
 
 function orderCols(o: Order) {
   return [

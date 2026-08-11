@@ -7,9 +7,45 @@ ActiveDeliveries = {} -- source -> { deliveryId, orderId, totalPallets, remainin
 -- oxmysql returns TINYINT(1) as Lua boolean, not integer 1
 local function isTruthy(v) return v == 1 or v == true end
 
+-- oxmysql usually returns TIMESTAMP columns as "YYYY-MM-DD HH:MM:SS" strings, but has been
+-- observed returning ISO-ish "YYYY-MM-DDTHH:MM:SS" or a raw epoch number depending on driver
+-- config — accept all three instead of assuming one, since a bad type here previously crashed
+-- the whole openDashboard callback (":match" called on a non-string) and left players locked
+-- out of the NUI entirely.
+local function parseTimestamp(ts)
+    if type(ts) == "number" then
+        return ts > 1e12 and math.floor(ts / 1000) or math.floor(ts)
+    end
+    if type(ts) ~= "string" then return nil end
+    local y, mo, d, h, mi, s = ts:match("(%d+)-(%d+)-(%d+)[T ](%d+):(%d+):(%d+)")
+    if not y then return nil end
+    return os.time({
+        year = tonumber(y) or 1970, month = tonumber(mo) or 1, day = tonumber(d) or 1,
+        hour = tonumber(h) or 0, min = tonumber(mi) or 0, sec = tonumber(s) or 0,
+    })
+end
+
+-- Seconds left before `order` can be accepted again, given the player's last completed
+-- delivery timestamp for it (nil = never completed it). 0 = no cooldown / already expired.
+-- Exposed on Orders since party_mission.lua's convoy-start path duplicates Orders.Accept's
+-- gate checks and needs the same cooldown enforcement.
+-- pcall-wrapped: this only feeds a countdown display, never worth crashing dashboard load over.
+local function cooldownRemaining(order, lastCompletedAt)
+    local cooldown = order.cooldown_seconds or 0
+    if cooldown <= 0 then return 0 end
+    local ok, completedEpoch = pcall(parseTimestamp, lastCompletedAt)
+    if not ok or not completedEpoch then return 0 end
+    local remaining = cooldown - (os.time() - completedEpoch)
+    return remaining > 0 and remaining or 0
+end
+Orders.CooldownRemaining = cooldownRemaining
+
 function Orders.GetAvailableForPlayer(source)
     local pData = Player.GetData(source)
     if not pData then return {} end
+
+    local ok, result = pcall(DB.GetLastCompletedByOrder, pData.identifier)
+    local lastCompletedByOrder = ok and result or {}
 
     local filtered = {}
     for _, order in ipairs(DB.GetAvailableOrders()) do
@@ -17,7 +53,10 @@ function Orders.GetAvailableForPlayer(source)
         if order.level_required > pData.level then visible = false end
         if isTruthy(order.requires_hazmat) and not Player.HasSkill(source, "h3") then visible = false end
         if isTruthy(order.requires_long_hauler) and not Player.HasSkill(source, "d3") then visible = false end
-        if visible then filtered[#filtered + 1] = order end
+        if visible then
+            order.cooldown_remaining = cooldownRemaining(order, lastCompletedByOrder[order.id])
+            filtered[#filtered + 1] = order
+        end
     end
     return filtered
 end
@@ -38,6 +77,9 @@ function Orders.Accept(source, orderId)
     if order.level_required > pData.level then return false, Locale("error.level_not_sufficient") end
     if isTruthy(order.requires_hazmat) and not Player.HasSkill(source, "h3") then return false, Locale("error.hazmat_license_required") end
     if isTruthy(order.requires_long_hauler) and not Player.HasSkill(source, "d3") then return false, Locale("error.long_hauler_skill_required") end
+    if cooldownRemaining(order, DB.GetLastCompletedAt(pData.identifier, orderId)) > 0 then
+        return false, Locale("error.mission_on_cooldown")
+    end
 
     if type(order.pickup_pallet_coords) == "string" then
         order.pickup_pallet_coords = json.decode(order.pickup_pallet_coords)

@@ -90,6 +90,11 @@ RegisterNUICallback('equipVehicle', function(data, cb)
     end, data.slot)
 end)
 
+-- Pure client-side: despawning owned/spawned vehicle doesn't touch equipped_vehicle in the DB.
+RegisterNUICallback('parkVehicle', function(_, cb)
+    cb({ ok = Vehicle.Park() })
+end)
+
 RegisterNUICallback('buyTrailer', function(data, cb)
     lib.callback('polarix_trucker:buyTrailer', false, function(success, price, err, ownedTrailers)
         if success then
@@ -114,6 +119,11 @@ RegisterNUICallback('equipTrailer', function(data, cb)
         end
         cb({ ok = success })
     end, data.slot)
+end)
+
+-- Pure client-side: despawning owned/spawned trailer doesn't touch equipped_trailer in the DB.
+RegisterNUICallback('parkTrailer', function(_, cb)
+    cb({ ok = Trailer.Park() })
 end)
 
 RegisterNUICallback('unlockSkill', function(data, cb)

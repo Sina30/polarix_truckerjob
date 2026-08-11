@@ -42,6 +42,7 @@ export interface AdminOrder {
   level_required: number;
   requires_hazmat: boolean;
   requires_long_hauler: boolean;
+  cooldown_seconds: number;
   is_active: boolean;
   delivery_count: number;
   created_by: string | null;
@@ -98,6 +99,7 @@ function emptyOrder(): AdminOrder {
     level_required: 1,
     requires_hazmat: false,
     requires_long_hauler: false,
+    cooldown_seconds: 0,
     is_active: true,
     delivery_count: 0,
     created_by: null,
@@ -145,6 +147,7 @@ function mapRawOrder(raw: any): AdminOrder {
     level_required: raw.level_required ?? 1,
     requires_hazmat: !!raw.requires_hazmat,
     requires_long_hauler: !!raw.requires_long_hauler,
+    cooldown_seconds: raw.cooldown_seconds ?? 0,
     is_active: raw.is_active === undefined ? true : !!raw.is_active,
     delivery_count: raw.delivery_count ?? 0,
     created_by: raw.created_by ?? null,
