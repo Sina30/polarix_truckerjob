@@ -75,7 +75,7 @@ end
 
 function DB.UpdateOrder(orderId, order, adminIdentifier)
     MySQL.update.await(
-        ("UPDATE %s SET name=?,cargo=?,cargo_type=?,weight_kg=?,distance_km=?,reward_base=?,xp_base=?,time_minutes=?,pickup_label=?,pickup_city=?,pickup_x=?,pickup_y=?,pickup_z=?,pickup_heading=?,pickup_pallet_coords=?,dropoff_label=?,dropoff_city=?,dropoff_x=?,dropoff_y=?,dropoff_z=?,dropoff_heading=?,comment=?,tag=?,tag_color=?,tag_bg=?,icon=?,level_required=?,requires_hazmat=?,requires_long_hauler=?,updated_by=?,updated_at=NOW() WHERE id=?"):format(T.orders),
+        ("UPDATE %s SET name=?,cargo=?,cargo_type=?,weight_kg=?,distance_km=?,reward_base=?,xp_base=?,time_minutes=?,pickup_label=?,pickup_city=?,pickup_x=?,pickup_y=?,pickup_z=?,pickup_heading=?,pickup_pallet_coords=?,dropoff_label=?,dropoff_city=?,dropoff_x=?,dropoff_y=?,dropoff_z=?,dropoff_heading=?,comment=?,tag=?,tag_color=?,tag_bg=?,icon=?,level_required=?,requires_hazmat=?,requires_long_hauler=?,cooldown_seconds=?,updated_by=?,updated_at=NOW() WHERE id=?"):format(T.orders),
         {
             order.name, order.cargo, order.cargo_type, order.weight_kg, order.distance_km,
             order.reward_base, order.xp_base, order.time_minutes, order.pickup_label, order.pickup_city,
@@ -84,6 +84,7 @@ function DB.UpdateOrder(orderId, order, adminIdentifier)
             order.dropoff_label, order.dropoff_city, order.dropoff_x, order.dropoff_y, order.dropoff_z, order.dropoff_heading or 0.0,
             order.comment, order.tag, order.tag_color, order.tag_bg, order.icon,
             order.level_required, order.requires_hazmat and 1 or 0, order.requires_long_hauler and 1 or 0,
+            order.cooldown_seconds or 0,
             adminIdentifier, orderId,
         }
     )
@@ -117,7 +118,7 @@ end
 
 function DB.InsertOrder(order)
     MySQL.insert.await(
-        ("INSERT INTO %s (id,name,cargo,cargo_type,weight_kg,distance_km,reward_base,xp_base,time_minutes,pickup_label,pickup_city,pickup_x,pickup_y,pickup_z,pickup_heading,pickup_pallet_coords,dropoff_label,dropoff_city,dropoff_x,dropoff_y,dropoff_z,dropoff_heading,comment,tag,tag_color,tag_bg,icon,level_required,requires_hazmat,requires_long_hauler,is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"):format(T.orders),
+        ("INSERT INTO %s (id,name,cargo,cargo_type,weight_kg,distance_km,reward_base,xp_base,time_minutes,pickup_label,pickup_city,pickup_x,pickup_y,pickup_z,pickup_heading,pickup_pallet_coords,dropoff_label,dropoff_city,dropoff_x,dropoff_y,dropoff_z,dropoff_heading,comment,tag,tag_color,tag_bg,icon,level_required,requires_hazmat,requires_long_hauler,cooldown_seconds,is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"):format(T.orders),
         {
             order.id, order.name, order.cargo, order.cargo_type, order.weight_kg, order.distance_km,
             order.reward_base, order.xp_base, order.time_minutes, order.pickup_label, order.pickup_city,
@@ -127,7 +128,7 @@ function DB.InsertOrder(order)
             order.dropoff_x, order.dropoff_y, order.dropoff_z, order.dropoff_heading or 0.0,
             order.comment, order.tag, order.tag_color,
             order.tag_bg, order.icon, order.level_required, order.requires_hazmat and 1 or 0,
-            order.requires_long_hauler and 1 or 0, 1,
+            order.requires_long_hauler and 1 or 0, order.cooldown_seconds or 0, 1,
         }
     )
 end
@@ -157,6 +158,25 @@ function DB.AbandonDelivery(deliveryId)
     MySQL.update.await(
         ("UPDATE %s SET status='abandoned', completed_at=NOW() WHERE id=?"):format(T.deliveries),
         { deliveryId }
+    )
+end
+
+-- Cooldown lookups: only 'completed' deliveries count (failed/abandoned don't start a cooldown).
+
+function DB.GetLastCompletedByOrder(identifier)
+    local rows = MySQL.query.await(
+        ("SELECT order_id, MAX(completed_at) AS completed_at FROM %s WHERE identifier = ? AND status = 'completed' GROUP BY order_id"):format(T.deliveries),
+        { identifier }
+    )
+    local map = {}
+    for _, row in ipairs(rows) do map[row.order_id] = row.completed_at end
+    return map
+end
+
+function DB.GetLastCompletedAt(identifier, orderId)
+    return MySQL.scalar.await(
+        ("SELECT MAX(completed_at) FROM %s WHERE identifier = ? AND order_id = ? AND status = 'completed'"):format(T.deliveries),
+        { identifier, orderId }
     )
 end
 

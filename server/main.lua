@@ -71,6 +71,7 @@ AddEventHandler('onResourceStart', function(resourceName)
     MySQL.query.await(([[ALTER TABLE %s ADD COLUMN IF NOT EXISTS created_by VARCHAR(60) DEFAULT NULL]]):format(T.orders))
     MySQL.query.await(([[ALTER TABLE %s ADD COLUMN IF NOT EXISTS updated_by VARCHAR(60) DEFAULT NULL]]):format(T.orders))
     MySQL.query.await(([[ALTER TABLE %s ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NULL DEFAULT NULL]]):format(T.orders))
+    MySQL.query.await(([[ALTER TABLE %s ADD COLUMN IF NOT EXISTS cooldown_seconds INT UNSIGNED DEFAULT 0]]):format(T.orders))
 
     MySQL.query.await(([[CREATE TABLE IF NOT EXISTS %s (
         id           INT AUTO_INCREMENT PRIMARY KEY,

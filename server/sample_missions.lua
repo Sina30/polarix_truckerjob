@@ -11,7 +11,7 @@ return {
         comment = "Handle with care! Fragile goods inside.",
         tag = "FRAGILE", tag_color = "#b58a05", tag_bg = "rgba(232,180,8,0.16)", icon = "tabler:bottle",
         level_required = 1, requires_hazmat = false, requires_long_hauler = false,
-        pickup_heading = 0.0, dropoff_heading = 0.0,
+        pickup_heading = 0.0, dropoff_heading = 0.0, cooldown_seconds = 1800,
     },
     {
         id = "order-st", name = "Steel Beams", cargo = "Heavy", cargo_type = "heavy",
@@ -23,7 +23,7 @@ return {
         comment = "Heavy load — secure properly before transit.",
         tag = "HEAVY", tag_color = "#6b7280", tag_bg = "rgba(107,114,128,0.16)", icon = "tabler:crane",
         level_required = 3, requires_hazmat = false, requires_long_hauler = false,
-        pickup_heading = 0.0, dropoff_heading = 0.0,
+        pickup_heading = 0.0, dropoff_heading = 0.0, cooldown_seconds = 5400,
     },
     {
         id = "order-ch", name = "Chemical Drums", cargo = "Hazmat", cargo_type = "hazmat",
@@ -35,7 +35,7 @@ return {
         comment = "Hazardous materials — licensed drivers only.",
         tag = "HAZMAT", tag_color = "#dc2626", tag_bg = "rgba(220,38,38,0.16)", icon = "tabler:biohazard",
         level_required = 1, requires_hazmat = true, requires_long_hauler = false,
-        pickup_heading = 0.0, dropoff_heading = 0.0,
+        pickup_heading = 0.0, dropoff_heading = 0.0, cooldown_seconds = 3600,
     },
     {
         id = "order-lv", name = "Livestock", cargo = "Live Animals", cargo_type = "live",
@@ -47,7 +47,7 @@ return {
         comment = "Live animals — drive carefully, no harsh braking.",
         tag = "LIVE", tag_color = "#16a34a", tag_bg = "rgba(22,163,74,0.16)", icon = "tabler:paw",
         level_required = 2, requires_hazmat = false, requires_long_hauler = false,
-        pickup_heading = 0.0, dropoff_heading = 0.0,
+        pickup_heading = 0.0, dropoff_heading = 0.0, cooldown_seconds = 2700,
     },
     {
         id = "order-cr", name = "Crates (Standard)", cargo = "Standard", cargo_type = "standard",
@@ -59,6 +59,6 @@ return {
         comment = "Standard freight — no special requirements.",
         tag = "STD", tag_color = "#3b82f6", tag_bg = "rgba(59,130,246,0.16)", icon = "tabler:package",
         level_required = 1, requires_hazmat = false, requires_long_hauler = false,
-        pickup_heading = 0.0, dropoff_heading = 90.1649,
+        pickup_heading = 0.0, dropoff_heading = 90.1649, cooldown_seconds = 0,
     },
 }
